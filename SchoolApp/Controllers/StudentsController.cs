@@ -20,10 +20,25 @@ namespace SchoolApp.Controllers
         }
 
         // GET: Students
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Student.ToListAsync());
-        }
+       
+public async Task<IActionResult> Index(string? searchString)
+{
+    var students = from s in _context.Student select s;
+
+    if (!string.IsNullOrEmpty(searchString))
+    {
+        var text = searchString.ToLower();
+
+        students = students.Where(s => s.Name!.ToLower().Contains(text)
+                                    || s.StudentNo!.ToLower().Contains(text)
+                                    || s.Email!.ToLower().Contains(text));
+    }
+
+    ViewData["searchString"] = searchString;
+
+    return View(await students.ToListAsync());
+}
+
 
         // GET: Students/Details/5
         public async Task<IActionResult> Details(int? id)
